@@ -1,0 +1,64 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Sää haku</title>
+  </head>
+  <body>
+    <!-- Root container for react components -->
+    <div id='root'></div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.6.1/react.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.6.1/react-dom.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
+    
+    <script type="text/babel">
+
+      class Weather extends React.Component {
+
+        constructor(props) {
+          super(props);
+          this.state = {temperature:'', weather: '', icon:'', city: ''};
+        }
+
+        searchCity = e => {
+        
+          fetch('http://api.openweathermap.org/data/2.5/weather?q='+this.state.city+'&APPID=70aea46dc4dd5641c503e261195f7013&units=metric')
+          .then((response) => response.json()) 
+          .then((responseData) => { 
+          console.log(responseData);
+                this.setState({ 
+                    temperature: responseData.main.temp,
+                    weather: responseData.weather[0].main,
+                    icon : 'http://openweathermap.org/img/w/' + responseData.weather[0].icon + '.png'
+                });
+               
+          })        
+        }
+
+        inputChanged = (event) => {
+            this.setState({city: event.target.value});
+            console.log(this.state.city);
+            
+            };
+        
+        
+        render() { 
+          return (
+            <div>
+              City: <input type="text" value={this.state.city} onChange={this.inputChanged} />
+                    <button onClick={this.searchCity}>send</button>
+              
+                
+                  <p>Temperature: {this.state.temperature}</p> 
+                  <p>Weather: {this.state.weather}</p> 
+                  <p><img src={this.state.icon} alt="kuva"></img></p>
+              
+            </div>
+          );
+        }
+      }
+      ReactDOM.render(<Weather />, document.getElementById('root'));
+    </script>
+  </body>
+</html>
