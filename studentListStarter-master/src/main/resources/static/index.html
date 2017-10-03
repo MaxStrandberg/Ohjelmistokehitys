@@ -21,6 +21,7 @@
 	class App extends React.Component {
 		  constructor(props) {
 		      super(props);
+			this.deleteStudent = this.deleteStudent.bind(this);
 		      this.state = {
 		          students: [],
 		      };
@@ -36,13 +37,19 @@
 				this.setState({students: responseData._embedded.students});
 		      });     
 		  } 
+
+		deleteStudent(student) {
+			fetch(student._links.self.href, {method: 'DELETE'})
+				.then(res => this.loadStudentsFromServer())
+				.catch(err => console.error(err))
+		}
 		  
 		  render() {
 		    return (
 		      	<div>
  			
 				<StudentTable
-					
+					deleteStudent={this.deleteStudent}
 					students={this.state.students}/>
 			</div>
 		    );
@@ -58,7 +65,7 @@
 
 		var students = this.props.students.map(student => <Student
 				key={student._links.self.href}
-				
+				deleteStudent={this.props.deleteStudent}
 				student={student}/>);
 		
 	    	return (
@@ -82,7 +89,12 @@
 	class Student extends React.Component {
 	    constructor(props) {
 	        super(props);
+			this.deleteStudent = this.deleteStudent.bind(this);
 	    }
+		
+		deleteStudent() {
+			this.props.deleteStudent(this.props.student);
+		}
 	 
 	    render() {
 	        return (
@@ -90,6 +102,10 @@
 					<td>{this.props.student.firstName}</td>
 					<td>{this.props.student.lastName}</td>
 					<td>{this.props.student.email}</td>
+					<td>
+						<button className="btn btn-danger btn-xs" onClick={this.deleteStudent}>Delete</button>
+					</td>
+
 				</tr>
 	        );
 	    } 
