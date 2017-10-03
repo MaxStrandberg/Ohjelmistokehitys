@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>React + Spring</title>
+</head>
+
+<body>
+    <div class='container'>
+        <div id='root'></div>
+	</div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.3.2/react.min.js"></script>
+    <script src="https://fb.me/react-dom-15.0.1.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.24/browser.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+
+
+<script type="text/babel">
+	class App extends React.Component {
+		  constructor(props) {
+		      super(props);
+		      this.state = {
+		          students: [],
+		      };
+		   }
+		 
+		  componentDidMount() {
+			this.loadStudentsFromServer();
+		  }
+		  
+		  // Load students from database
+		  loadStudentsFromServer() {
+		      fetch('http://localhost:8080/api/students').then((response) => response.json()).then((responseData) => {
+				this.setState({students: responseData._embedded.students});
+		      });     
+		  } 
+		  
+		  render() {
+		    return (
+		      	<div>
+ 			
+				<StudentTable
+					
+					students={this.state.students}/>
+			</div>
+		    );
+		  }
+		}
+		    	
+	class StudentTable extends React.Component {
+		constructor(props) {
+			super(props);
+		}
+		    
+		render() {
+
+		var students = this.props.students.map(student => <Student
+				key={student._links.self.href}
+				
+				student={student}/>);
+		
+	    	return (
+				<div>
+					<table className="table table-striped">
+						<thead>
+							<tr>
+								<th>Firstname</th>
+								<th>Lastname</th>
+								<th>Email</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>{students}</tbody>
+					</table>
+				</div>
+	     	);
+	  }
+	}
+		        
+	class Student extends React.Component {
+	    constructor(props) {
+	        super(props);
+	    }
+	 
+	    render() {
+	        return (
+				<tr>
+					<td>{this.props.student.firstName}</td>
+					<td>{this.props.student.lastName}</td>
+					<td>{this.props.student.email}</td>
+				</tr>
+	        );
+	    } 
+	}
+
+	ReactDOM.render(<App />, document.getElementById('root') );	
+	</script>
+
+</body>
+</html>
